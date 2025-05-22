@@ -28,6 +28,6 @@ Created by **Dominique Thomas**
 [github.com/dominique-thomas](https://github.com/dominique-thomas)
 
 ## License
-
+**Copyright (c) 2025 dominique-thomas**  
 This project is provided publicly for demonstration and educational purposes only.  
 Reuse, redistribution, or republishing of any source code or assets is not permitted without explicit permission from the author.  
