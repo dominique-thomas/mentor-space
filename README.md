@@ -27,8 +27,7 @@ This project was created to explore the use of conversational AI and instruction
 Created by **Dominique Thomas**  
 [github.com/dominique-thomas](https://github.com/dominique-thomas)
 
-## 📄 License
+## License
 
 This project is provided publicly for demonstration and educational purposes only.  
 Reuse, redistribution, or republishing of any source code or assets is not permitted without explicit permission from the author.  
-See [LICENSE.md](LICENSE.md) for full usage terms.
