@@ -1,0 +1,86 @@
+<!--
+  Project: Mentor Space
+  Description: Main layout for the interactive virtual mentor app focused on leadership development and self-assessment.
+  Author: Dominique Thomas (github.com/dominique-thomas)
+  License: Shared publicly for demonstration purposes only. Reuse or redistribution not permitted without permission.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mentor Space</title>
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="images/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="images/android-chrome-192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="images/android-chrome-512x512.png">
+
+  <link rel="stylesheet" href="css/index.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/js/all.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+  <div class="chat-container">
+    <div class="chat-header">
+      <h2 class="chat-title">Mentor Space</h2>
+      <div class="chat-icons">        
+
+        <a id="icon-resources" href="#" class="icon menu"><i class="fas fa-book-open " title="Resources"></i></a>
+        <a id="icon-about" href="#" class="icon menu"><i class="fas fa-info-circle" title="About"></i></a>
+      </div>
+    </div>
+
+    <div class="chat-body scrollable" id="chat-body">
+
+      <div class="chat-section" id="resources-panel">
+        <button class="blue-button back-to-chat" title="Back to Chat">
+          <i class="fas fa-arrow-left"></i> Back to Chat
+        </button>
+
+        <h3>Local Resources</h3>
+          <ul>
+            <li><a href="documents/leadership_style_reflection_sheet.pdf" target="_blank" title="Leadership Style Reflection Sheet">Leadership Style Reflection Sheet (<i class="fa-solid fa-file-pdf"></i>)</a></li>
+            <li><a href="documents/leadership_traits_checklist.pdf" target="_blank" title="Leadership Traits Checklist">Leadership Traits Checklist (<i class="fa-solid fa-file-pdf"></i>)</a></li>
+            <li><a href="documents/leadership_observations_journal.pdf" target="_blank" title="Leadership Observations Journal">Leadership Observations Journal (<i class="fa-solid fa-file-pdf"></i>)</a></li>                        
+          </ul>
+
+          <hr class="divider">
+
+          <h3>External Resources</h3>
+          <ul>
+            <li><a href="https://learndigital.withgoogle.com/digitalgarage" target="_blank" title="Google Digital Garage">Google Digital Garage (<i class="fa-solid fa-link"></i>)</a></li>
+            <li><a href="https://www.linkedin.com/learning/topics/leadership" target="_blank" title="LinkedIn Learning - Leadership">LinkedIn Learning - Leadership (<i class="fa-solid fa-link"></i>)</a></li>
+            <li><a href="https://www.coursera.org/search?query=leadership" target="_blank" title="Coursera - Leadership">Coursera - Leadership (<i class="fa-solid fa-link"></i>)</a></li>
+            <li><a href="https://www.edx.org/learn/leadership" target="_blank" title="edX - Leadership Development">edX - Leadership Development (<i class="fa-solid fa-link"></i>)</a></li>
+          </ul>
+      </div>
+  
+      <div class="chat-section" id="about-panel">
+        <button class="blue-button back-to-chat" title="Back to Chat">
+          <i class="fas fa-arrow-left"></i> Back to Chat
+        </button>
+         <p>
+          Mentor Space is a guided leadership simulation designed to help new and aspiring leaders explore their personal leadership style through reflection and conversation. 
+          <br><br>
+          This project is free to use and is provided as-is. The website and resources were designed and developed by <a href="https://www.linkedin.com/in/dominique-thomas-ab56b433/" target="_blank" title="Dominique Thomas">Dominique Thomas</a>.
+          <br><br>          
+          Artificial Intelligence (AI) responses powered by <a href="https://gemini.google.com/app" target="_blank" title="Gemini">Gemini</a> and hosted via <a href="https://firebase.google.com/" target="_blank" title="Firebase">Firebase</a>.
+          Illustrations and AI prompt logic were developed with assistance using <a href="https://openai.com/" target="_blank" title="ChatGPT">ChatGPT</a>.
+        </p>
+        <div class="mentor-goodbye">
+            <img src="images/best_wishes.png" alt="Best Wishes" title="Good luck on your leadership journey!">
+        </div>       
+      </div>
+
+      <div id="chat-main" class="chat-section active" style="position:relative;">
+      </div>
+
+    </div>
+  </div>
+  <script src="js/data.js"></script>
+  <script src="js/index.js" type="module"></script>  
+</body>
+</html>

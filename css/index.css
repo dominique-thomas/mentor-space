@@ -1,0 +1,489 @@
+/*
+  Project: Mentor Space
+  Description: Stylesheet for chat-style interface, layout, and visual theming of the leadership mentor simulation.
+  Author: Dominique Thomas (github.com/dominique-thomas)
+  License: Shared publicly for demonstration purposes only. Reuse or redistribution not permitted without permission.
+*/
+body {
+  font-family: "Roboto", Arial, sans-serif;
+  background-color: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.chat-container{
+  width: 100%;
+  max-width: 800px;
+  padding: 1rem;
+  max-height: 90vh;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+a{
+  color: #549de2;
+  text-decoration: none;
+}
+
+h3{
+  color:#333;
+}
+
+a:hover{
+  text-decoration: underline;
+}
+
+#about-panel, #resources-panel{
+  padding: 20px;
+}
+
+.mentor-goodbye {
+  padding-top: 20px;
+  text-align: center;
+}
+
+.mentor-goodbye img {
+  width: 50%;
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+  border-radius: 8px; 
+}
+
+.mentor-signoff {
+  margin-top: 0.75rem;
+  font-style: italic;
+  font-size: 1rem;
+  color: #333;
+}
+  
+.chat-header {
+  background-color: #0084ff;
+  color: white;
+  padding: 10px 15px 10px 15px; 
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 500;
+  border-top-left-radius: 1rem;
+  border-top-right-radius: 1rem;
+  height: 50px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.chat-header .title {
+  margin-left: 8px;
+}
+
+.chat-header .icons {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.chat-icons {
+  cursor: pointer;
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.icon.menu{
+  padding-left: 10px;
+}
+
+.chat-section {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  pointer-events: none;
+  padding: 1rem;
+  transition: opacity 0.3s ease;
+  overflow: hidden; 
+}
+
+.chat-section.active {
+  opacity: 1;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+.chat-body.scrollable {
+overflow-y: auto;
+}
+
+.chat-body {
+  position: relative;
+  height: 550px;
+  overflow: hidden;
+  background: #fff;
+  padding: 0;
+  flex-shrink: 0;
+  border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+   box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
+}
+
+.chat-main{
+  height: 100%;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.message {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.4;
+  position: relative;
+  opacity: 0;
+}
+
+.mentor-message {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.4;
+  position: relative;
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 1s;
+}
+  
+.avatar {
+  opacity: 0;
+  width: 60px;
+  height: auto;
+  aspect-ratio: 689 / 765;
+  border-radius: 50%;
+  background-color: #f0f5f7;
+  margin-right: 10px;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 1s;
+}
+
+.chat-options {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  padding: 16px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+  transition-delay: 2s; 
+}
+
+.chat-options.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mentor-message.mentor {
+  background: #f0f5f7;
+  align-self: flex-start;
+  border-top-left-radius: 0;
+  margin-top: 15px;
+}
+
+.message.user {
+  background: #0084ff;
+  color: white;
+  align-self: flex-end;
+  border-top-right-radius: 0;
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
+  max-width: 70%;
+  text-align: right;
+  white-space: pre-wrap;
+  word-wrap: break-word; 
+  overflow-wrap: break-word;
+}
+
+.message-wrapper {
+  display: flex;
+  align-items: flex-start;
+  padding-bottom: 15px;
+}
+
+.message-wrapper-user {
+  align-items: flex-start;
+  padding-bottom: 15px;
+}
+
+.message-wrapper.mentor {
+  flex-direction: row;
+}
+
+.message-wrapper-user.user {
+  flex-direction: row-reverse;
+}
+
+hr.divider {
+  border: none;
+  border-top: 1px solid #e4e9eb;
+  margin: 12px 0;
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 0.5s;
+}
+
+.btn-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;  
+}
+
+.chat-btn {
+  background-color: #e5f1ff;
+  color: #0084ff;
+  padding: 10px 14px;
+  border: 1px solid #c6e0fb;
+  border-radius: 20px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  max-width: 60%;
+  text-align: left;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.chat-btn .context {
+  color: #00386d;
+}
+
+.chat-btn.visited {
+  position: relative;
+}
+
+.visited-eye {
+  position: absolute;
+  right: -10px;
+  color: #0084ff;
+  font-size: 0.9em;
+}
+
+.chat-btn:hover {
+  background-color: #d6eaff;
+  border-color: #aad4ff;
+}
+
+.typing-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  padding: 8px 12px;
+  max-width: fit-content;
+  margin-top: 20px;
+}
+
+.chat-input-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  margin: 10px 0 10px auto;
+  max-width: 75%;
+  padding: 10px;
+}
+
+.chat-input {
+  flex: 1;
+  outline: none;
+  font-family: "Roboto", Arial, sans-serif;
+  font-size: .9em;
+  resize: none;
+  overflow-y: hidden;
+  line-height: 1.5em;
+  max-height: 4.5em;
+  width: 100%;
+  font-size: .9rem;
+  padding: 8px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  border: 1px solid #e4e9eb;
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 1s;
+}
+
+.chat-submit {
+  background-color: #0084ff;
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 50%;
+  margin-left: 8px;
+  cursor: pointer;
+  height: 40px;
+  width: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.3s ease;
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 1s;
+}
+
+.chat-submit:hover {
+  background-color: #0084ff;
+}
+
+.chat-submit i {
+  font-size: 16px;
+}
+
+.blue-button {
+  background-color: #0084ff;
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.blue-button i {
+  font-size: 16px;
+}
+
+.blue-button:hover {
+  background-color: #0084ff;
+}
+
+.emphasis{
+  font-weight: bold;
+  color:#0084ff;
+}
+
+.hidden{
+  display: none;
+}
+
+.disabled{
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: default;
+}
+
+.icon{
+  color:#fff;
+}
+
+.icon:hover{
+  color:#bfdcfa;
+}
+
+.icon:active{
+  color:#fff;
+}
+
+.message-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.emoji-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+  justify-content: flex-start;
+  width: 100%;
+  font-size: 16px;
+  padding-right: 4px;
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 1s;
+}
+
+.emoji-bar button {
+  background-color: #e9f1f5;
+  border: 1px solid #d1e3ea;
+  color: #333;
+  border-radius: 12px;
+  font-size: 14px;
+  padding: 4px 6px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.emoji-bar button:hover {
+  background-color: #d4eaf7;
+  transform: scale(1.1);
+}
+
+.emoji-reaction {
+  margin-top: -30px;
+  margin-left: 0;
+  font-size: 16px;
+  padding: 2px 6px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  max-width: fit-content;
+}
+
+.mentor-emoji-reaction {
+  margin-left: 0;
+  font-size: 16px;
+  padding: 2px 6px;
+  margin-top: 2px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  max-width: fit-content;
+  align-self: flex-end;
+  opacity: 0;
+  animation: fadeIn 0.5s ease forwards;
+  animation-delay: 0.8s;
+}
+
+.emoji-bar.disabled {
+  pointer-events: none;
+  opacity: 0;
+  animation: none !important; 
+}
+
+.inline-image{
+  width: 40%;
+  border-radius: 20px;
+  margin-top: 30px;
+  opacity: 0;
+  animation: fadeIn 1s ease forwards;
+  animation-delay: 1.2s;
+}
+
+.book {
+  font-style: italic;
+}
+
+.no-animation * {
+  animation: none !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
