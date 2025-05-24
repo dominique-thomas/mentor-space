@@ -27,10 +27,10 @@ const baseDelay = 500;
 const delayPerChunk = 1600;
 const visitedOptions = new Set();
 const userScores = {
-  empathy: 4,
-  communication: 2,
-  diplomacy: 1,
-  discipline: 1
+  empathy: 0,
+  communication: 0,
+  diplomacy: 0,
+  discipline: 0
 };
 let quizSession = {
   questionList: [],
@@ -88,11 +88,14 @@ function generateFreeformAiPrompt(userInput, styles = []) {
   return `
     The user has asked: "${userInput}"
 
-    Please respond conversationally, as a leadership mentor. Use first-person language (I find, I think, I believe) and keep the tone warm, clear, and thoughtful.
+    You are a virtual leadership mentor. Only respond to questions or comments related to leadership topics, such as communication, motivation, challenges, feedback, conflict, values, and team dynamics.
 
-    Respond in 2-3 sentences. No preamble; just provide the mentor's message.
+    If the user's message is unrelated (such as asking how you're doing), gently redirect them to leadership-related topics. You can say something like, "Let's focus on your growth as a leader" or "Happy to help you reflect on your leadership journey."
+
+    Speak in a warm, clear, and thoughtful tone. Use first-person language (e.g., I find, I think, I believe). Respond in 2-3 sentences. Do not include a preamble.
 
     If the user says something you don't understand, respond by saying: ${unsureStr}
+
     ${tone ? `Use this tone: ${tone}` : ""}
   `;
 }
@@ -1022,11 +1025,13 @@ function startQuiz() {
   const available = [...quizQuestions];
   const selected = [];
 
+  // Reset visited flag on all questions
+  quizQuestions.forEach(q => q.visited = false);
+
   // Randomize the quiz questions and save to the 'selected' array
   while (selected.length < MAX_QUIZ_QUESTIONS && available.length > 0) {
     const randIndex = Math.floor(Math.random() * available.length);
     const question = available.splice(randIndex, 1)[0];
-    question.visited = false; 
     selected.push(question);
   }
 
@@ -1040,6 +1045,9 @@ function startQuiz() {
   Object.keys(userScores).forEach(key => {
     userScores[key] = 0;
   });
+
+  // Reset the visited button options at the start of the quiz
+  resetQuizVisitedOptions();
 
   presentQuizQuestion();
 }
@@ -1131,6 +1139,7 @@ async function finishQuiz() {
   addDivider();
 
   processMessageQueue({ text: `Your responses are really interesting, ${firstName}! ` + message }, async () => {
+     
     if (method === "ai" && sessionPromptCount < MAX_SESSION_PROMPTS) {
       const prompt = generateQuizResultsAiPrompt(style);
       const response = await sendToGemini(prompt);
@@ -1153,30 +1162,37 @@ async function finishQuiz() {
         console.warn("Failed to parse AI response:", err);
       }
     }
-
     returnToActiveMenu();
   });
 }
 
 // Helper function that resets the quiz response visits which is needed when users retake the quiz
 function resetQuizResponseVisits() {
-
   [mentorQuizResponses, aiMentorQuizResponse].forEach(responseSet => {
-
-    for (const key in responseSet) {    
-
+    for (const key in responseSet) {
       const topic = responseSet[key];
 
-      if (topic && typeof topic === "object") {
-        if (Array.isArray(topic.list)) {
-          topic.visited = false;
-          topic.list.forEach(item => item.visited = false);
-        } else if ("visited" in topic) {
-          topic.visited = false;
-        }
+      if (topic && typeof topic === "object" && "visited" in topic) {
+        topic.visited = false;
       }
     }
   });
+}
+
+// Resets 'visited' icon on the buttons when the quiz is reset
+function resetQuizVisitedOptions() {
+  const quizIdsToReset = [
+    "quiz_leadershipStyle",
+    "quiz_challenges",
+    "quiz_conflictResolution",
+    "quiz_motivation",
+    "quiz_communication",
+    "quiz_feedback",
+    "quiz_books",
+    "quiz_quotes"
+  ];
+
+  quizIdsToReset.forEach(id => visitedOptions.delete(id));
 }
 
 // Helper function that is used to determine the user's leadership style
