@@ -18,6 +18,7 @@ const sections = {
   about: document.getElementById("about-panel"),
   main: document.getElementById("chat-main")
 };
+let aiLimitReached = false;
 let sessionPromptCount = 0;
 const MAX_SESSION_PROMPTS = 3;
 const REACTION_CHANCE = 0.4;      
@@ -60,19 +61,23 @@ async function sendToGemini(prompt) {
     if (!response.ok) {
       const fallbackText = await response.text();
       console.error("Server returned error:", fallbackText);
+      aiLimitReached = true;
       return pickRandom(leadershipStyleInputFallback);
     }
 
     const data = await response.json();
 
     if (data.text === "__AI_LIMIT_REACHED__") {
+      aiLimitReached = true;
       return pickRandom(leadershipStyleInputFallback);
     }
 
+    aiLimitReached = false;
     return data.text || pickRandom(leadershipStyleInputFallback);
 
   } catch (err) {
     console.error("Failed to reach Gemini:", err);
+    aiLimitReached = true;
     return pickRandom(leadershipStyleInputFallback);
   }
 }
@@ -964,6 +969,19 @@ async function handleCustomInputFromUser() {
             });
           }, 1000);
         });
+      }
+      // Fallback if max prompts are reached
+      else{
+        const fallback = pickRandom(leadershipStyleInputFallback);
+
+        processMessageQueue({ text: fallback }, () => {
+          addDivider();
+          setTimeout(() => {
+            processMessageQueue({ text: bridge }, () => {
+              returnToActiveMenu();
+            });
+          }, 1000);
+        });
       }      
     });
   });
@@ -1127,42 +1145,56 @@ function handleQuizChoice(option) {
 
 // Used to determine the user's leadership style and sets the mentor's response type (built-in feedback or AI feedback)
 async function finishQuiz() {
-  const result = determineLeadershipStyle(userScores);
-  const { style, method } = result;
-
-  userLeadershipStyle = style;
-
-  const message = method === "static"
-    ? "Based on your responses, I have a good sense of your leadership style. Is there anything you'd like to talk about?"
-    : "Based on your responses, you show a blend of leadership traits. Is there anything you'd like to talk about?";
+  let { style, method } = determineLeadershipStyle(userScores);
+  const message =
+    method === "static"
+      ? "I have a good sense of your leadership style based on your responses. Is there anything you'd like to talk about?"
+      : "Based on your responses, you show a blend of leadership traits. Is there anything you'd like to talk about?";
 
   addDivider();
 
-  processMessageQueue({ text: `Your responses are really interesting, ${firstName}! ` + message }, async () => {
-     
-    if (method === "ai" && sessionPromptCount < MAX_SESSION_PROMPTS) {
+  processMessageQueue({ text: `Your responses are really interesting, ${firstName}! ${message}` }, async () => {
+    if (method === "ai") {
       const prompt = generateQuizResultsAiPrompt(style);
       const response = await sendToGemini(prompt);
-      sessionPromptCount++;
 
-      try {
-        const cleaned = cleanGeminiJsonResponse(response);
-        const parsed = JSON.parse(cleaned);
+      // Added as a safety net in case we reach the max db threshold or if there's an error and 'ai' is the chosen response method  
+      if (aiLimitReached) {
+        method = "static";
+        style = [style[0]];
+        userLeadershipStyle = style;
+        sessionPromptCount = MAX_SESSION_PROMPTS;
+      } else {
+        sessionPromptCount++;
+        try {
+          const cleaned = cleanGeminiJsonResponse(response);
+          const parsed = JSON.parse(cleaned);
 
-        for (let key in parsed) {
-          if (aiMentorQuizResponse[key]) {
-            if (Array.isArray(parsed[key])) {
-              aiMentorQuizResponse[key].list = parsed[key];
-            } else {
-              aiMentorQuizResponse[key].text = parsed[key];
+          for (let key in parsed) {
+            if (aiMentorQuizResponse[key]) {
+              if (Array.isArray(parsed[key])) {
+                aiMentorQuizResponse[key].list = parsed[key];
+              } else {
+                aiMentorQuizResponse[key].text = parsed[key];
+              }
             }
-          }
+          }          
+        } catch (err) {
+          console.warn("Failed to parse AI response:", err);
+          method = "static";
+          style = [style[0]];
+          userLeadershipStyle = style;
+          sessionPromptCount = MAX_SESSION_PROMPTS;
         }
-      } catch (err) {
-        console.warn("Failed to parse AI response:", err);
+
+        userLeadershipStyle = style;
       }
+    } 
+    else {
+      userLeadershipStyle = style;
     }
-    returnToActiveMenu();
+
+    showQuizSubMenuPage1();
   });
 }
 
@@ -1203,20 +1235,19 @@ function determineLeadershipStyle(scores) {
   const [secondStyle, secondScore] = sorted[1];
   const isClearWinner = topScore - secondScore >= DOMINANT_THRESHOLD;
 
-  // If there's one clear style, specify we want to use built-in (static) responses
-  if (isClearWinner) {
-    return {
-      style: [topStyle],
-      method: "static"
-    };
-  } 
-  // Else, if the user has a blended leadership style, use AI responses
-  else {
-    return {
-      style: [topStyle, secondStyle],
-      method: "ai"
-    };
+  // If the user has a blended leadership style, use AI responses, assuming we haven't reached the max number of prompts
+  if (!isClearWinner && sessionPromptCount < MAX_SESSION_PROMPTS) {
+      return {
+        style: [topStyle, secondStyle],
+        method: "ai"
+      };
   }
+
+  // If there's one clear style, specify we want to use built-in (static) responses
+  return {
+    style: [topStyle],
+    method: "static"
+  };
 }
 
 // Helper method used to clean a JSON response that has been returned from Gemini
