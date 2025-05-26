@@ -738,7 +738,7 @@ function showMentorResponse(option, source) {
     return;
   }
 
-  // Let users to select a topic again, but don't repeat message
+  // Let users select a topic again, but don't repeat the same message
   if (topic.visited) {
     showAlreadyVisitedMsg();
     return;
@@ -750,7 +750,7 @@ function showMentorResponse(option, source) {
 
 // Helper function that is used to determine which array object to pull from when the mentor is responding to the user
 function getActiveQuizResponseSet() {
-   const isBlended = Array.isArray(userLeadershipStyle) && userLeadershipStyle.length > 1;
+  const isBlended = Array.isArray(userLeadershipStyle) && userLeadershipStyle.length > 1;
   return isBlended ? aiMentorQuizResponse : mentorQuizResponses;
 }
 
@@ -814,6 +814,7 @@ function maybeReactToUserMessage(userInput) {
     }
   }
 }
+
 
 //----------------------------------
 //  User Chat Message Handlers
@@ -1164,7 +1165,8 @@ async function finishQuiz() {
         style = [style[0]];
         userLeadershipStyle = style;
         sessionPromptCount = MAX_SESSION_PROMPTS;
-      } else {
+      } 
+      else {
         sessionPromptCount++;
         try {
           const cleaned = cleanGeminiJsonResponse(response);
@@ -1182,8 +1184,7 @@ async function finishQuiz() {
         } catch (err) {
           console.warn("Failed to parse AI response:", err);
           method = "static";
-          style = [style[0]];
-          userLeadershipStyle = style;
+          style = [style[0]];          
           sessionPromptCount = MAX_SESSION_PROMPTS;
         }
 
