@@ -25,6 +25,14 @@ const personalMenuPrompts = [
   "I'm an open book. What would you like to know?"
 ];
 
+// Quiz specific responses; used in the quiz discussion menu
+const quizReturnPrompts = [
+  "What quiz results would you like to explore next?",
+  "Sure, let's revisit your quiz results.",
+  "Ready to explore more about your leadership style?",
+  "Here's what you can explore based on your quiz results:"
+];
+
 // Bridge responses that are used to change subject, used when returning to the active menu
 const backToMenuBridgeLines = [
   "Let's see what else we can dive into.",

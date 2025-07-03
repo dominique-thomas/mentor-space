@@ -254,8 +254,8 @@ function showIntroMessage(){
 // Shows the main menu 
 function showMainMenu(){    
   const options = [
-    { id: "personalQuestionMenu", label: `Tell me something personal about you <span class="context">(menu)</span>` },
-    { id: "leadershipStyleMenu", label: `Tell me about your leadership style <span class="context">(menu)</span>` },
+    { id: "personalQuestionMenu", label: `I want to know something personal about you <span class="context">(menu)</span>` },
+    { id: "leadershipStyleMenu", label: `I want to know more about your leadership style <span class="context">(menu)</span>` },
     { id: "quizMenu", label: `I want to know more about my leadership style <span class="context">(quiz)</span>` }
   ];
 
@@ -328,7 +328,10 @@ function showQuizSubMenu() {
   }
 
   // Else, if they've already taken the quiz, they will be redirected 
-  showQuizSubMenuPage1()
+  addDivider();
+  processMessageQueue({ text: pickRandom(quizReturnPrompts) }, () => {
+    showQuizSubMenuPage1();
+  }); 
 }
 
 // Shows the first page of quiz sub-menu, where users can ask questions concerning their leadership style (1 of 2)
@@ -418,13 +421,8 @@ function handleUserChoice(option) {
     
     //Quiz sub-menu
     case "quizMenu":    
-      showQuizSubMenu();
-    break;
     case "quiz_back":
-        addDivider();
-        processMessageQueue({ text: pickRandom(personalMenuPrompts) }, () => {
-          showQuizSubMenu();
-        });
+       showQuizSubMenu();
     break;
     case "quiz_next":
         addDivider();
@@ -436,6 +434,7 @@ function handleUserChoice(option) {
     case "quiz_retake":
       quizTaken = true;
       addDivider();
+      resetQuizResponseVisits();
       processMessageQueue({ text: "Let's get started." }, () => {
         startQuiz(); 
       });      
@@ -694,23 +693,27 @@ function showMentorResponse(option, source) {
   const isQuiz = source === "quiz";
 
   // Determine response set (AI or static)
-  const responseSet = getActiveQuizResponseSet();
-  const data = responseSet[key];
+  const responseSet = isQuiz
+    ? getActiveQuizResponseSet()
+    : mentorLeadershipResponses.find(m => m.style === mentorLeadershipStyle);
 
-  // Fallback for static responses only (for mentor or backup)
-  const styleKey = isQuiz ? userLeadershipStyle[0] : mentorLeadershipStyle;
-  const responses = isQuiz ? mentorQuizResponses : mentorLeadershipResponses;
-  const entry = responses.find(m => m.style === styleKey);
+  const isArrayResponse = Array.isArray(responseSet);
+  let topic;
+
+  if (isArrayResponse) {
+    const entry = responseSet.find(m => m.style === userLeadershipStyle[0] || userLeadershipStyle);
+    topic = entry?.[key];
+  } else {
+    topic = responseSet?.[key];
+  }
 
   // If we don't have data from either set...
-  if (!data && (!entry || !entry[key])) {
+  if (!topic) {
     addDivider();
     addMentorMessage(unsureStr);
     returnToActiveMenu();
     return;
   }
-
-  const topic = data || entry[key];
 
   if (Array.isArray(topic.list)) {
     const anyVisited = topic.list.some(item => item.visited);
@@ -1149,8 +1152,8 @@ async function finishQuiz() {
   let { style, method } = determineLeadershipStyle(userScores);
   const message =
     method === "static"
-      ? "I have a good sense of your leadership style based on your responses. Is there anything you'd like to talk about?"
-      : "Based on your responses, you show a blend of leadership traits. Is there anything you'd like to talk about?";
+    ? "I have a good sense of your leadership style based on your responses. Let me gather my thoughts<span class='thinking dots'>...</span>"
+    : "Based on your responses, you show a blend of leadership traits. Give me a moment to think through your results<span class='thinking dots'>...</span>";
 
   addDivider();
 
@@ -1187,24 +1190,36 @@ async function finishQuiz() {
           style = [style[0]];          
           sessionPromptCount = MAX_SESSION_PROMPTS;
         }
-
-        userLeadershipStyle = style;
+        userLeadershipStyle = style;        
       }
     } 
     else {
       userLeadershipStyle = style;
     }
 
-    showQuizSubMenuPage1();
+    document.querySelectorAll(".thinking").forEach(el => {
+      el.classList.remove("dots");
+    });
+    processMessageQueue({ text: "I'm ready when you are. What would you like to explore next? "},() => {
+      showQuizSubMenuPage1();
+    });
   });
 }
 
 // Helper function that resets the quiz response visits which is needed when users retake the quiz
 function resetQuizResponseVisits() {
-  [mentorQuizResponses, aiMentorQuizResponse].forEach(responseSet => {
-    for (const key in responseSet) {
-      const topic = responseSet[key];
+  // Reset AI-generated response object
+  for (const key in aiMentorQuizResponse) {
+    const topic = aiMentorQuizResponse[key];
+    if (topic && typeof topic === "object" && "visited" in topic) {
+      topic.visited = false;
+    }
+  }
 
+  // Reset static mentorQuizResponses array
+  mentorQuizResponses.forEach(responseObj => {
+    for (const key in responseObj) {
+      const topic = responseObj[key];
       if (topic && typeof topic === "object" && "visited" in topic) {
         topic.visited = false;
       }
