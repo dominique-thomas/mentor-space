@@ -356,7 +356,10 @@ function showQuizSubMenuPage2(){
     { id: "quiz_feedback", key: "feedback", label: "How might I provide feedback?" },
     { id: "quiz_books", key: "books", label: "Can you recommend a book for me to read?" },
     { id: "quiz_quotes", key: "quotes", label: "What leadership quote reflects my style?" },
-    { id: "quiz_retake", key: "retake", label: `I want to revisit my leadership style <span class="context">(retake quiz)</span>` },
+    /*
+    TODO:: Temporarily disabled. Enable once additional leadership styles are implemented.
+    { id: "quiz_retake", key: "retake", label: `I want to revisit my leadership style <span class="context">(retake quiz)</span>` }, 
+     */
     { id: "quiz_back", key: "back", label: returnMenuStr },
     { id: "main", key: "main", label: mainMenuStr }
   ];
